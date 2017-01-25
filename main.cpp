@@ -1,9 +1,14 @@
 #include "mbed.h"
+#include <time.h>
 
 static float valSeuil = 0.3f;
 //boolean informations spécifique sur le parcours
 bool prioriteADroite    = false;
 bool raccourci          = false;
+
+//timer
+clock_t begin;
+double time_spent;
 
 //bouton utilisateur
 DigitalIn mybutton(USER_BUTTON);
@@ -125,27 +130,27 @@ void doK2000Light(){
             switch(a) {
                 case 1: turnOffAllLed();
                         ledDroiteCoin   = true;
-                        wait(0.07);
+                        wait(0.1);
                         break;
                 case 2: turnOffAllLed();
                         ledDroite   = true;
-                        wait(0.07);
+                        wait(0.1);
                         break;
                 case 3: turnOffAllLed();
                         ledGauche   = true;
-                        wait(0.07);
+                        wait(0.1);
                         break;
                 case 4: turnOffAllLed();
                         ledGaucheCoin   = true;
-                        wait(0.07);
+                        wait(0.2);
                         break;
                 case 5: turnOffAllLed();
                         ledGauche   = true;
-                        wait(0.07);
+                        wait(0.2);
                         break;
                 case 6: turnOffAllLed();
                         ledDroite   = true;
-                        wait(0.07);
+                        wait(0.2);
                         break;
             }
             
@@ -222,7 +227,7 @@ void initialisation() {
     gaucheCoinSeuil = (((gaucheCoinNoire - gaucheCoinBlanc) * valSeuil) + gaucheCoinBlanc);
     
     
-    pc.printf("Blanc \n\r DroiteC : %f, Droite : %f, Centre : %f Gauche : %f, GaucheC : %f \n\r",
+    /*pc.printf("Blanc \n\r DroiteC : %f, Droite : %f, Centre : %f Gauche : %f, GaucheC : %f \n\r",
         droiteCoinBlanc, droiteBlanc, centreBlanc, gaucheBlanc, gaucheCoinBlanc);
     
     pc.printf("Noire \n\r DroiteC : %f, Droite : %f, Centre : %f Gauche : %f, GaucheC : %f \n\r",
@@ -230,7 +235,7 @@ void initialisation() {
         
     pc.printf("Seuil \n\r DroiteC : %f, Droite : %f, Centre : %f Gauche : %f, GaucheC : %f \n\r",
         droiteCoinSeuil, droiteSeuil, centreSeuil, gaucheSeuil, gaucheCoinSeuil);
-       
+       */
 }
 int main() {
     
@@ -239,14 +244,48 @@ int main() {
     turnOnAllLed();
     wait(1);
     
+    begin = clock();
     
     while(1) {
         
+        time_spent = (double)(clock() - begin);
+        pc.printf("Prio droite : %d, Rac : %d, Time %lf\n\r", prioriteADroite, raccourci, time_spent);
+
+        if (time_spent > 100) {
+            begin = clock();
+            prioriteADroite    = false;
+            raccourci          = false;
+        }
+wait(0.2);
         
        
-        if((irDroite == 0) || ( irCentre == 0)){
+       
+       
+        if ((time_spent < 100) && 
+            (prioriteADroite == true) && 
+            ((irDroite == 0) || ( irCentre == 0))   ){
             stop();
-        } else if ((isSensorCentreBlack() && !isSensorDroiteBlack() && !isSensorGaucheBlack()) ||
+        }  
+        
+        else if ((time_spent < 100) &&
+                 (raccourci == true)  && 
+                 ( !isSensorDroiteBlack() && !isSensorCoinDroiteBlack() && isSensorCentreBlack() && (isSensorGaucheBlack() || isSensorCoinGaucheBlack()))){
+            avancer();
+            wait(0.1);
+            tournerGaucheViolent();
+            wait(0.2);
+        
+        
+        } else if(  isSensorCentreBlack() && isSensorDroiteBlack() && isSensorCoinDroiteBlack() && !isSensorGaucheBlack() && !isSensorCoinGaucheBlack()) {
+            prioriteADroite = true;
+            begin = clock();
+        } else if (isSensorCentreBlack() && !isSensorDroiteBlack() && !isSensorCoinDroiteBlack() && isSensorGaucheBlack() && isSensorCoinGaucheBlack()) {
+            raccourci   = true;
+            begin = clock();
+ 
+ 
+ 
+        } /*else if ((isSensorCentreBlack() && !isSensorDroiteBlack() && !isSensorGaucheBlack()) ||
             (isSensorCentreBlack() && isSensorDroiteBlack() && isSensorGaucheBlack())) { 
             avancer();   
         } else if(isSensorCoinDroiteBlack()) {
@@ -260,6 +299,6 @@ int main() {
 
         } else {
             stop();    
-        }
+        }*/
     }
 }
