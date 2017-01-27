@@ -7,7 +7,7 @@
 class PhotoResistance{
     
     private:
-    const static float valSeuil = 0.3f;
+    const static float valSeuil = 0.4f;
     
     void setWhileValues();
     void setBlackValues();
@@ -40,6 +40,9 @@ class PhotoResistance{
     float gaucheNoire;
     float gaucheCoinNoire;
     
+    // serial
+    Serial serialOut;
+    
     public:
     PhotoResistance();
     void capteurInit();
@@ -48,7 +51,7 @@ class PhotoResistance{
     bool isSensorCentreBlack();
     bool isSensorGaucheBlack();
     bool isSensorGaucheCoinBlack();
-    
+    void getSensorsState();
 };
 
 #endif

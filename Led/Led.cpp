@@ -24,10 +24,11 @@ void Led::doK2000Light(){
         
         for (int a=1; a < 7; a++){ 
     
-            if (blueButton == 0)
+            if (blueButton == 0){
                 // button pressed !
-                turnOnAllLed();
-                return;
+                    turnOnAllLed();
+                    return;
+                }
     
             turnOffAllLed();
     
@@ -46,15 +47,15 @@ void Led::doK2000Light(){
                     break;
                 case 4: 
                     ledGaucheCoin   = true;
-                    wait(0.2);
+                    wait(0.1);
                     break;
                 case 5: 
                     ledGauche       = true;
-                    wait(0.2);
+                    wait(0.1);
                     break;
                 case 6: 
                     ledDroite       = true;
-                    wait(0.2);
+                    wait(0.1);
                     break;
             }
         }

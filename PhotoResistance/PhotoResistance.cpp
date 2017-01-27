@@ -1,6 +1,6 @@
 #include "PhotoResistance.hpp"
 
-PhotoResistance::PhotoResistance(): prDroiteCoin(A0), prDroite(A1), prCentre(A2), prGauche(A3), prGaucheCoin(A4){
+PhotoResistance::PhotoResistance(): prDroiteCoin(A0), prDroite(A1), prCentre(A2), prGauche(A3), prGaucheCoin(A4), serialOut(SERIAL_TX, SERIAL_RX){
     // constructeur
     droiteCoinSeuil = 0.0f;
     droiteSeuil     = 0.0f;
@@ -47,6 +47,9 @@ void PhotoResistance::setWhileValues(){
     centreBlanc     = prCentre.read();
     gaucheBlanc     = prGauche.read();
     gaucheCoinBlanc = prGaucheCoin.read();
+    
+    serialOut.printf("Pr blanc \n\r DroiteC : %f, Droite : %f, Centre : %f Gauche : %f, GaucheC : %f \n\r",
+        droiteCoinBlanc, droiteBlanc, centreBlanc, gaucheBlanc, gaucheCoinBlanc);
 }
 
 void PhotoResistance::setBlackValues(){
@@ -55,6 +58,9 @@ void PhotoResistance::setBlackValues(){
     centreNoire     = prCentre.read();
     gaucheNoire     = prGauche.read();
     gaucheCoinNoire = prGaucheCoin.read();
+    
+    serialOut.printf("Pr Noire \n\r DroiteC : %f, Droite : %f, Centre : %f Gauche : %f, GaucheC : %f \n\r",
+        droiteCoinNoire, droiteNoire, centreNoire, gaucheNoire, gaucheCoinNoire);
 }
 
 void PhotoResistance::setSeuilValues(){
@@ -62,7 +68,10 @@ void PhotoResistance::setSeuilValues(){
     droiteSeuil     = (((droiteNoire - droiteBlanc) * valSeuil) + droiteBlanc);
     centreSeuil     = (((centreNoire - centreBlanc) * valSeuil) + centreBlanc);
     gaucheSeuil     = (((gaucheNoire - gaucheBlanc) * valSeuil) + gaucheBlanc);
-    gaucheCoinSeuil = (((gaucheCoinNoire - gaucheCoinBlanc) * valSeuil) + gaucheCoinBlanc);    
+    gaucheCoinSeuil = (((gaucheCoinNoire - gaucheCoinBlanc) * valSeuil) + gaucheCoinBlanc);
+    
+    serialOut.printf("Pr Seuil \n\r DroiteC : %f, Droite : %f, Centre : %f Gauche : %f, GaucheC : %f \n\r",
+        droiteCoinSeuil, droiteSeuil, centreSeuil, gaucheSeuil, gaucheCoinSeuil);
 }
 
 bool PhotoResistance::isSensorDroiteCoinBlack(){
@@ -83,4 +92,38 @@ bool PhotoResistance::isSensorGaucheBlack(){
 
 bool PhotoResistance::isSensorGaucheCoinBlack(){
     return (prGaucheCoin.read() > gaucheCoinSeuil) ? true:false;   
+}
+
+void PhotoResistance::getSensorsState(){
+    if(isSensorGaucheCoinBlack()){
+            serialOut.printf(" | ");    
+        } else {
+            serialOut.printf(" . "); 
+        }
+        
+        if(isSensorGaucheBlack()){
+            serialOut.printf(" | ");    
+        } else {
+            serialOut.printf(" . "); 
+        }
+        
+        if(isSensorCentreBlack()){
+            serialOut.printf(" | ");    
+        } else {
+            serialOut.printf(" . "); 
+        }
+        
+        if(isSensorDroiteBlack()){
+            serialOut.printf(" | ");    
+        } else {
+            serialOut.printf(" . "); 
+        }
+        
+        if(isSensorDroiteCoinBlack()){
+            serialOut.printf(" | ");    
+        } else {
+            serialOut.printf(" . "); 
+        }
+        
+        serialOut.printf("\n\r");     
 }

@@ -5,13 +5,13 @@ InfraRouge::InfraRouge(): irDroite(D4), irCentre(D3), irGauche(D2){
 }
 
 bool InfraRouge::isDroiteDetected(){
-    return irDroite ? true:false;
+    return irDroite ? false:true;
 }
 
 bool InfraRouge::isCentreDetected(){
-    return irCentre ? true:false;
+    return irCentre ? false:true;
 }
     
 bool InfraRouge::isGaucheDetected(){
-    return irGauche ? true:false;
+    return irGauche ? false:true;
 }

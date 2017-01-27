@@ -11,6 +11,9 @@ class Moteur{
     PwmOut      E1;
     PwmOut      E2;
     
+    const static float vitesseMax = 1.0f;
+    const static float vitesseNormal = 0.5f;
+    
     public:
     Moteur();
     void avancer();

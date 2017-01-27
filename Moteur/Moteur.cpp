@@ -6,9 +6,9 @@ Moteur::Moteur(): M1(D8), M2(D7), E1(D9), E2(D6){
 
 void Moteur::avancer(){
     M1 = true;
-    E1 = 1.0f;
+    E1 = vitesseNormal;
     M2 = true;
-    E2 = 1.0f;
+    E2 = vitesseNormal;
 }
 
 void Moteur::stop(){
