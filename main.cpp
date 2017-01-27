@@ -78,15 +78,15 @@ Serial pc(SERIAL_TX, SERIAL_RX);
 
 void tournerGaucheViolent(){
     M1 = true;
-    E1 = 1.0f;
+    E1 = 0.8f;
     M2 = true;
-    E2 = 0.2;
+    E2 = 0.0;
 }
 void tournerGauche(){
     M1 = true;
-    E1 = 0.8f;
+    E1 = 0.6f;
     M2 = true;
-    E2 = 0.4f;
+    E2 = 0.2f;
 }
 void avancer(){
     M1 = true;
@@ -96,15 +96,15 @@ void avancer(){
 }
 void tournerDroite(){
     M1 = true;
-    E1 = 0.4f;
+    E1 = 0.2f;
     M2 = true;
-    E2 = 0.8f;
+    E2 = 0.6f;
 }
 void tournerDroiteViolent(){
     M1 = true;
-    E1 = 0.2f;
+    E1 = 0.0f;
     M2 = true;
-    E2 = 1.0f;
+    E2 = 0.8f;
 }
 
 
@@ -250,10 +250,9 @@ int main() {
     turnOnAllLed();
     wait(1);
     timer1 = clock();
-
+    timer2 = clock();
+    
     while(1) {
-        
-//isSensorCoinGaucheBlack() && isSensorGaucheBlack() && isSensorCentreBlack() && isSensorDroiteBlack() && isSensorCoinDroiteBlack()
         
 
         /**
@@ -261,8 +260,14 @@ int main() {
           */
         //détection d'une priorité
         if (!isSensorCoinGaucheBlack() && !isSensorGaucheBlack() && isSensorCentreBlack() && isSensorDroiteBlack() && isSensorCoinDroiteBlack()){
+            turnOffAllLed();
+            wait(0.1);
+            turnOnAllLed();
             prioriteADroite = true;
             timer1          = clock();
+
+            
+            
         //détection d'un raccourci
         } else if (isSensorCoinGaucheBlack() && isSensorGaucheBlack() && isSensorCentreBlack() && !isSensorDroiteBlack() && !isSensorCoinDroiteBlack()){
             raccourci   = true;
@@ -282,19 +287,21 @@ int main() {
           
 
         //Action d'arret si priorité à gérer
-        if (((irDroite == 0) ||  (irCentre == 0)) && (prioriteADroite == true) && (timeAttente1 > 10)){
+        if (((irDroite == 0) ||  (irCentre == 0)) && (prioriteADroite == true) && (timeAttente1 < 200)&& (timeAttente1 > 10)){
+        //if ((irDroite == 0) ||  (irCentre == 0) || (irGauche == 0)) {
             while ((irDroite == 0) ||  (irCentre == 0) || (irGauche == 0)){
                 turnOffAllLed();
                 stop();
             }
             turnOnAllLed();
         //gestion du raccourci
-        } else if ((isSensorGaucheBlack() ||  isSensorCoinGaucheBlack()) && (timeAttente1 > 10)) {
+        /*} else if ((isSensorGaucheBlack() ||  isSensorCoinGaucheBlack()) && (timeAttente1 > 10)) {
             turnOffAllLed();
             stop();
             break;
             
         //fonctionnement Normal
+        } */
         } else if ((isSensorCentreBlack() && !isSensorDroiteBlack() && !isSensorGaucheBlack()) ||
             (isSensorCentreBlack() && isSensorDroiteBlack() && isSensorGaucheBlack())) { 
             avancer();   
