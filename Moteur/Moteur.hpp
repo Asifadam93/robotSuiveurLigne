@@ -11,20 +11,15 @@ class Moteur{
     PwmOut      E1;
     PwmOut      E2;
     
-    const static float vitesseHight     = 0.8f;
-    const static float vitesseMedium    = 0.6f;
-    const static float vitesseNormal    = 0.4f;
+    const static float vitesseReference = 0.8f;
+    const static float vitesseMax = 1.0f;
     
     public:
     Moteur();
     void avancer();
     void stop();
-    void tournerGauche();
-    void tournerGaucheViolent();
-    void tournerGaucheExtreme();
-    void tournerDroite();
-    void tournerDroiteViolent();
-    void tournerDroiteExtreme();
+    void tournerGauche(int force);
+    void tournerDroite(int force);
     
 };
 

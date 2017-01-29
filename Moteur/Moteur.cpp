@@ -6,9 +6,9 @@ Moteur::Moteur(): M1(D8), M2(D7), E1(D9), E2(D6){
 
 void Moteur::avancer(){
     M1 = true;
-    E1 = vitesseHight;
+    E1 = vitesseMax;
     M2 = true;
-    E2 = vitesseHight;
+    E2 = vitesseMax;
 }
 
 void Moteur::stop(){
@@ -16,45 +16,39 @@ void Moteur::stop(){
     E2 = 0.0f;
 }
 
-void Moteur::tournerGauche(){
+void Moteur::tournerGauche(int force){
     M1 = true;
-    E1 = vitesseHight;
-    M2 = true;
-    E2 = vitesseMedium;
+    E1 = vitesseReference;
+    
+    if ((force >= 1) && (force <=4)) {
+        M2 = true;
+        E2 = vitesseReference - ((vitesseReference/4) * force);
+    }
+    if (force >=4 ) {
+        E1 = vitesseMax;
+    }
+    if (force >= 5) {
+        M2 = false;
+        E2 = vitesseReference /2;
+    }
 }
 
-void Moteur::tournerGaucheViolent(){
-    M1 = true;
-    E1 = vitesseHight;
+void Moteur::tournerDroite(int force){
     M2 = true;
-    E2 = 0.0f;
+    E2 = vitesseReference;
+    
+    if ((force >= 1) && (force <=4)) {
+        M1 = true;
+        E1 = vitesseReference - ((vitesseReference/4) * force);
+    }
+    if (force >=4 ) {
+        E2 = vitesseMax;
+    }
+    if (force >= 5) {
+        M1 = false;
+        
+        E1 = vitesseReference /2;
+    }
 }
 
-void Moteur::tournerGaucheExtreme(){
-    M1 = true;
-    E1 = vitesseHight;
-    M2 = false;
-    E2 = vitesseHight;
-}
-
-void Moteur::tournerDroite(){
-    M1 = true;
-    E1 = vitesseMedium;
-    M2 = true;
-    E2 = vitesseHight;
-}
-
-void Moteur::tournerDroiteViolent(){
-    M1 = true;
-    E1 = 0.0f;
-    M2 = true;
-    E2 = vitesseHight;
-}
-
-void Moteur::tournerDroiteExtreme(){
-    M1 = false;
-    E1 = vitesseHight;
-    M2 = true;
-    E2 = vitesseHight;
-}
 
