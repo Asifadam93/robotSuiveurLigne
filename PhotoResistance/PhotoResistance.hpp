@@ -7,7 +7,7 @@
 class PhotoResistance{
     
     private:
-    const static float valSeuil = 0.4f;
+    const static float valSeuil = 0.3f;
     
     void setWhileValues();
     void setBlackValues();
