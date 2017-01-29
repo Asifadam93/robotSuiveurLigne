@@ -5,17 +5,20 @@
 #include "Moteur.hpp"
 
 //boolean informations spécifique sur le parcours
-bool prioriteADroite    = false;
-bool raccourci          = false;
+bool prioriteADroite            = false;
+bool raccourci                  = false;
 
 //mémorisation des capteurs
 bool cg, g, c, d, cd;
 
+
 //timer
 clock_t timerSortie;
+clock_t timerIndice;
 
 //temps d'attente
 double tempsAttenteSortie;
+double tempsAttenteIndice;
 
 //permet de mémoriser la dernière direction prise par le robot
 char lastDir = ' ';
@@ -36,16 +39,20 @@ void refreshCapteur() {
      c  = myPR.isSensorCentreBlack(); 
      d  = myPR.isSensorDroiteBlack(); 
      cd = myPR.isSensorDroiteCoinBlack(); 
+
 }
 
 int main() {
-    
+
     myPR.capteurInit();
     myLed.turnOnAllLed();
     wait(1);
     
      while(1) {
         refreshCapteur();
+        
+
+        
         /**
          *  Déplacement
          */  
@@ -91,18 +98,14 @@ int main() {
                 lastDir = ' ';
             } else {
                 myMoteur.stop();
-                while(!(blueButton == 0)) {
+                /*while(!(blueButton == 0)) {
                     serialOut.printf("%d - %d - %d - %d - %d * lastDir : %c tempsAttenteSortie : %f\n\r", cg, g, c, d, cd, lastDir, tempsAttenteSortie);
                     wait(1);
-                }
-                
+                }*/
             } 
         }
-        
-        
-        /**
-         *
-        */
+
     }
     
 }
+

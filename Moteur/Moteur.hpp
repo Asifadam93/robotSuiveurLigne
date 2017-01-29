@@ -11,9 +11,9 @@ class Moteur{
     PwmOut      E1;
     PwmOut      E2;
     
-    const static float vitesseHight     = 0.6f;
-    const static float vitesseMedium    = 0.4f;
-    const static float vitesseNormal    = 0.2f;
+    const static float vitesseHight     = 0.8f;
+    const static float vitesseMedium    = 0.6f;
+    const static float vitesseNormal    = 0.4f;
     
     public:
     Moteur();
@@ -29,3 +29,4 @@ class Moteur{
 };
 
 #endif
+
