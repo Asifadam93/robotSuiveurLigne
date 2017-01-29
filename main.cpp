@@ -1,45 +1,108 @@
 #include "mbed.h"
-#include "PhotoResistance.hpp"
-#include "InfraRouge.hpp"
 #include <time.h>
-
-InfraRouge myIR;
-PhotoResistance myPr;
-Serial serialOut(SERIAL_TX, SERIAL_RX);
+#include "PhotoResistance.hpp"
+#include "Led.hpp"
+#include "Moteur.hpp"
 
 //boolean informations spécifique sur le parcours
 bool prioriteADroite    = false;
 bool raccourci          = false;
 
+//mémorisation des capteurs
+bool cg, g, c, d, cd;
+
 //timer
-clock_t timer1;
-clock_t timer2;
+clock_t timerSortie;
 
 //temps d'attente
-double timeAttente1;
-double timeAttente2;
+double tempsAttenteSortie;
+
+//permet de mémoriser la dernière direction prise par le robot
+char lastDir = ' ';
+
+//instanciation des objets
+PhotoResistance myPR;
+Led myLed;
+Moteur myMoteur;
+Serial serialOut(SERIAL_TX, SERIAL_RX);
+DigitalIn blueButton(USER_BUTTON);
+
+void refreshCapteur() {
+    /**
+     * Mémorisation  des capteurs
+     */
+     cg = myPR.isSensorGaucheCoinBlack(); 
+     g  = myPR.isSensorGaucheBlack(); 
+     c  = myPR.isSensorCentreBlack(); 
+     d  = myPR.isSensorDroiteBlack(); 
+     cd = myPR.isSensorDroiteCoinBlack(); 
+}
 
 int main() {
     
-    myPr.capteurInit();
+    myPR.capteurInit();
+    myLed.turnOnAllLed();
+    wait(1);
     
-    while(1){
+     while(1) {
+        refreshCapteur();
+        /**
+         *  Déplacement
+         */  
+        if  ((!g && c && !d) || (g && c && d)) {
+            myMoteur.avancer();
+            lastDir = 'e';
+        } else if( cd ) {
+            myMoteur.tournerGaucheViolent();
+            lastDir = 'a';
+        } else if( cg ) {
+            myMoteur.tournerDroiteViolent();  
+            lastDir = 't';
+        } else if ( d ) {
+            myMoteur.tournerGauche();
+            lastDir = 'z';
+        } else if ( g ) {
+            myMoteur.tournerDroite();
+            lastDir = 'r';
+        //fonctionnement sortie ou fin du parcours
+        } else {
+            myMoteur.stop();
+            if ( (lastDir == 'a') || (lastDir == 'z') ) {
+                timerSortie = clock();
+                tempsAttenteSortie = clock() - timerSortie;
+                
+                while((tempsAttenteSortie < 100) && (!c)) {
+                    myMoteur.tournerGaucheViolent();
+                    tempsAttenteSortie = clock() - timerSortie;
+                    refreshCapteur(); 
+                }
+                lastDir = ' ';
+                
+                
+            } else if ( (lastDir == 't') || (lastDir == 'r') ) {
+                timerSortie = clock();
+                tempsAttenteSortie = clock() - timerSortie;
+                
+                while((tempsAttenteSortie < 100) && (!c)) {
+                    myMoteur.tournerDroiteViolent();
+                    tempsAttenteSortie = clock() - timerSortie;
+                    refreshCapteur();
+                }
+                lastDir = ' ';
+            } else {
+                myMoteur.stop();
+                while(!(blueButton == 0)) {
+                    serialOut.printf("%d - %d - %d - %d - %d * lastDir : %c tempsAttenteSortie : %f\n\r", cg, g, c, d, cd, lastDir, tempsAttenteSortie);
+                    wait(1);
+                }
+                
+            } 
+        }
         
-        myPr.getSensorsState();
         
+        /**
+         *
+        */
     }
     
-    /*timer1 = clock();
-    timer2 = clock();
-    
-    while(1){
-        
-        //détection priorité à droite
-        if (!myPr.isSensorCoinGaucheBlack() && !myPr.isSensorGaucheBlack() && myPr.isSensorCentreBlack() && myPr.isSensorDroiteBlack() && myPr.isSensorCoinDroiteBlack()){
-            prioriteADroite = true;
-            timer1          = clock();
-        } else if(isSensorCoinGaucheBlack() && isSensorGaucheBlack() && isSensorCentreBlack() && !isSensorDroiteBlack() && !isSensorCoinDroiteBlack()){
-                
-        }   
-    }*/
 }
