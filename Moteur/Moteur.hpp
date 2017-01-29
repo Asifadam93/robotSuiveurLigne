@@ -21,8 +21,10 @@ class Moteur{
     void stop();
     void tournerGauche();
     void tournerGaucheViolent();
+    void tournerGaucheExtreme();
     void tournerDroite();
     void tournerDroiteViolent();
+    void tournerDroiteExtreme();
     
 };
 
