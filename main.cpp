@@ -71,8 +71,8 @@ int main() {
                 timerSortie = clock();
                 tempsAttenteSortie = clock() - timerSortie;
                 
-                while((tempsAttenteSortie < 100) && (!c)) {
-                    myMoteur.tournerGaucheViolent();
+                while((tempsAttenteSortie < 50) && (!c)) {
+                    myMoteur.tournerGaucheExtreme();
                     tempsAttenteSortie = clock() - timerSortie;
                     refreshCapteur(); 
                 }
@@ -83,8 +83,8 @@ int main() {
                 timerSortie = clock();
                 tempsAttenteSortie = clock() - timerSortie;
                 
-                while((tempsAttenteSortie < 100) && (!c)) {
-                    myMoteur.tournerDroiteViolent();
+                while((tempsAttenteSortie < 50) && (!c)) {
+                    myMoteur.tournerDroiteExtreme();
                     tempsAttenteSortie = clock() - timerSortie;
                     refreshCapteur();
                 }
