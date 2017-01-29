@@ -30,6 +30,13 @@ void Moteur::tournerGaucheViolent(){
     E2 = 0.0f;
 }
 
+void Moteur::tournerGaucheExtreme(){
+    M1 = true;
+    E1 = vitesseHight;
+    M2 = false;
+    E2 = vitesseHight;
+}
+
 void Moteur::tournerDroite(){
     M1 = true;
     E1 = vitesseMedium;
@@ -44,3 +51,9 @@ void Moteur::tournerDroiteViolent(){
     E2 = vitesseHight;
 }
 
+void Moteur::tournerDroiteExtreme(){
+    M1 = false;
+    E1 = vitesseHight;
+    M2 = true;
+    E2 = vitesseHight;
+}
