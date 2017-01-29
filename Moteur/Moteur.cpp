@@ -6,9 +6,9 @@ Moteur::Moteur(): M1(D8), M2(D7), E1(D9), E2(D6){
 
 void Moteur::avancer(){
     M1 = true;
-    E1 = vitesseNormal;
+    E1 = vitesseHight;
     M2 = true;
-    E2 = vitesseNormal;
+    E2 = vitesseHight;
 }
 
 void Moteur::stop(){
@@ -18,28 +18,29 @@ void Moteur::stop(){
 
 void Moteur::tournerGauche(){
     M1 = true;
-    E1 = 0.8f;
+    E1 = vitesseHight;
     M2 = true;
-    E2 = 0.4f;
+    E2 = vitesseMedium;
 }
 
 void Moteur::tournerGaucheViolent(){
     M1 = true;
-    E1 = 1.0f;
+    E1 = vitesseHight;
     M2 = true;
-    E2 = 0.2;
+    E2 = 0.0f;
 }
 
 void Moteur::tournerDroite(){
     M1 = true;
-    E1 = 0.4f;
+    E1 = vitesseMedium;
     M2 = true;
-    E2 = 0.8f;
+    E2 = vitesseHight;
 }
 
 void Moteur::tournerDroiteViolent(){
     M1 = true;
-    E1 = 0.2f;
+    E1 = 0.0f;
     M2 = true;
-    E2 = 1.0f;
+    E2 = vitesseHight;
 }
+
