@@ -3,10 +3,12 @@
 #include "PhotoResistance.hpp"
 #include "Led.hpp"
 #include "Moteur.hpp"
+#include "InfraRouge.hpp"
 
 //boolean informations spécifique sur le parcours
 bool suspicionPrioriteADroite   = false;
 bool prioriteADroite            = false;
+bool virageEnCours              = false;
 bool raccourci                  = false;
 
 //mémorisation des capteurs
@@ -16,6 +18,7 @@ bool cgOld, gOld, cOld, dOld, cdOld;
 //timer
 clock_t timerSortie;
 clock_t timerPriorite;
+clock_t timerVirage;
 
 //temps d'attente
 double tempsAttenteSortie;
@@ -27,6 +30,7 @@ int lastDir = ' ';
 //instanciation des objets
 PhotoResistance myPR;
 Led myLed;
+InfraRouge myIR;
 Moteur myMoteur;
 Serial serialOut(SERIAL_TX, SERIAL_RX);
 DigitalIn blueButton(USER_BUTTON);
@@ -58,60 +62,98 @@ int main() {
     
      while(1) {
         refreshCapteur();
+         //TEST PRIORITE
+
+        /**
+          * Gestion de la détection des racourcis ou des priorités
+          */
+          //TODO AMELIORER DETECTION ET RALENTIR (si possible)
+        tempsAttentePriorite = (clock() - timerPriorite);
+        
+         /*if (virageEnCours == true) {
+            timerVirage  = (clock() - timerVirage);
+            if (timerVirage > 5) {
+                virageEnCours = false;
+            } 
+        }
+        
+
+        if (virageEnCours == false) {
+            if (tempsAttentePriorite > 10) {
+                suspicionPrioriteADroite = false;
+            }
+            if (tempsAttentePriorite > 20) {
+                prioriteADroite = false;
+            }
+                        
+            //gestion de la priorité  
+            if ((cdOld  && !cd  ) &&
+                (suspicionPrioriteADroite == true) && (tempsAttentePriorite < 10) ) {
+                myLed.turnOffAllLed();
+                wait(0.05);
+                myLed.turnOnAllLed();
+                
+                prioriteADroite = true;
+                suspicionPrioriteADroite = false;
+            }
+            if ((!cdOld  && cd && !prioriteADroite) && !(cd && d && c && g && cg) && (lastDir >3))  {
+    
+                suspicionPrioriteADroite = true;
+                prioriteADroite          = false;
+                timerPriorite = clock();
+                tempsAttentePriorite = 0;
+            }
+        }
+        */
+
         
         /**
          *  Déplacement
          */  
-        if  ((!g && c && !d) || (g && c && d)) {
+        
+        if (/*prioriteADroite && */(myIR.isDroiteDetected() || myIR.isCentreDetected())) {
+             while(myIR.isDroiteDetected() || myIR.isCentreDetected()|| myIR.isGaucheDetected() ) {
+                myMoteur.stop();
+                wait(1);
+             }
+        } else if ((!g && c && !d) || (g && c && d)) {
             myMoteur.avancer();
             lastDir = 5;
         } else if( cd && !d) {
-            if (lastDir == 1)
-                myMoteur.tournerGauche(5);
-            else
-                myMoteur.tournerGauche(4);
+            myMoteur.tournerGauche(4);
+            virageEnCours=true;
+            timerVirage = clock();
             lastDir = 1;
         } else if( cd && d) {
-                if (lastDir == 2)
-                    myMoteur.tournerGauche(4);
-                else
-                    myMoteur.tournerGauche(3);
+            myMoteur.tournerGauche(3);
+            timerVirage = clock();
+            virageEnCours=true;
             lastDir = 2;
         } else if( d && !c) {
-            if (lastDir == 3)
-                myMoteur.tournerGauche(3);
-            else
-                myMoteur.tournerGauche(2);
+            myMoteur.tournerGauche(2);
+            timerVirage = clock();
+            virageEnCours=true;
             lastDir = 3;
         } else if( d && c) {
-            if (lastDir == 4)
-                myMoteur.tournerGauche(2);
-            else
-                myMoteur.tournerGauche(1);
+            myMoteur.tournerGauche(1);
             lastDir = 4;
         } else if( cg && !g) {
-            if (lastDir == 9)
-                myMoteur.tournerDroite(5);
-            else
-                myMoteur.tournerDroite(4);
+            myMoteur.tournerDroite(4);
+            timerVirage = clock();
+            virageEnCours=true;
             lastDir = 9;
         } else if( cg && g) {
-            if (lastDir == 8)
-                myMoteur.tournerDroite(4);
-            else
-                myMoteur.tournerDroite(3);
+            myMoteur.tournerDroite(3);
+            timerVirage = clock();
+            virageEnCours=true;
             lastDir = 8;
         } else if( g && !c) {
-            if (lastDir == 7)
-                myMoteur.tournerDroite(3);
-            else
-                myMoteur.tournerDroite(2);
+            myMoteur.tournerDroite(2);
+            timerVirage = clock();
+            virageEnCours=true;
             lastDir = 7;
         } else if( g && c) {
-            if (lastDir == 6)
-                myMoteur.tournerDroite(2);
-            else
-                myMoteur.tournerDroite(1);
+            myMoteur.tournerDroite(1);
             lastDir = 6;
         //fonctionnement sortie ou fin du parcours
         } else {

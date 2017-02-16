@@ -3,7 +3,7 @@
 
 Moteur::Moteur(): M1(D8), M2(D7), E1(D9), E2(D6), serialOut(SERIAL_TX, SERIAL_RX){
     // constructeur
-    deltaE  = ((vitesseReference * float(2)) /float(7));
+    deltaE  = ((vitesseReference * float(2)) /float(6));
 }
 
 void Moteur::avancer(){
@@ -44,6 +44,5 @@ void Moteur::tournerDroite(int force){
     } else {
         E1 = tempoE;
     }
-    
 }
 
