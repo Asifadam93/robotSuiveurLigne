@@ -10,6 +10,9 @@ class Moteur{
     DigitalOut  M2;
     PwmOut      E1;
     PwmOut      E2;
+    float       tempoE;
+    float       deltaE;
+    Serial serialOut;
     
     const static float vitesseReference = 0.8f;
     const static float vitesseMax = 1.0f;
@@ -24,4 +27,3 @@ class Moteur{
 };
 
 #endif
-
