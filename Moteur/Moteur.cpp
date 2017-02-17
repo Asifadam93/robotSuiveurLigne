@@ -6,11 +6,18 @@ Moteur::Moteur(): M1(D8), M2(D7), E1(D9), E2(D6), serialOut(SERIAL_TX, SERIAL_RX
     deltaE  = ((vitesseReference * float(2)) /float(6));
 }
 
-void Moteur::avancer(){
-    M1 = true;
-    E1 = vitesseMax;
-    M2 = true;
-    E2 = vitesseMax;
+void Moteur::avancer(int force){
+    if (force == 2) {
+        M1 = true;
+        E1 = vitesseMax;
+        M2 = true;
+        E2 = vitesseMax;
+    } else {
+        M1 = true;
+        E1 = vitesseMax / float(2);
+        M2 = true;
+        E2 = vitesseMax / float(2);
+    }
 }
 
 void Moteur::stop(){
@@ -44,5 +51,6 @@ void Moteur::tournerDroite(int force){
     } else {
         E1 = tempoE;
     }
+    
 }
 

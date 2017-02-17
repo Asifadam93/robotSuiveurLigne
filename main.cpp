@@ -8,21 +8,23 @@
 //boolean informations spécifique sur le parcours
 bool suspicionPrioriteADroite   = false;
 bool prioriteADroite            = false;
-bool virageEnCours              = false;
+bool suspicionRaccourci         = false;
 bool raccourci                  = false;
+bool virageEnCours              = false;
 
 //mémorisation des capteurs
 bool cg, g, c, d, cd;
 bool cgOld, gOld, cOld, dOld, cdOld;
 
 //timer
-clock_t timerSortie;
-clock_t timerPriorite;
-clock_t timerVirage;
+clock_t timerSortie = clock();
+clock_t timerPrioriteOuRaccourci = clock();
+clock_t timerVirage = clock();
 
 //temps d'attente
-double tempsAttenteSortie;
-double tempsAttentePriorite;
+double tempsAttenteSortie = 0;
+double tempsAttenteVirage = 0;
+double tempsAttentePrioriteOuRaccourci = 0;
 
 //permet de mémoriser la dernière direction prise par le robot
 int lastDir = ' ';
@@ -62,95 +64,42 @@ int main() {
     
      while(1) {
         refreshCapteur();
-         //TEST PRIORITE
-
-        /**
-          * Gestion de la détection des racourcis ou des priorités
-          */
-          //TODO AMELIORER DETECTION ET RALENTIR (si possible)
-        tempsAttentePriorite = (clock() - timerPriorite);
-        
-         /*if (virageEnCours == true) {
-            timerVirage  = (clock() - timerVirage);
-            if (timerVirage > 5) {
-                virageEnCours = false;
-            } 
-        }
-        
-
-        if (virageEnCours == false) {
-            if (tempsAttentePriorite > 10) {
-                suspicionPrioriteADroite = false;
-            }
-            if (tempsAttentePriorite > 20) {
-                prioriteADroite = false;
-            }
-                        
-            //gestion de la priorité  
-            if ((cdOld  && !cd  ) &&
-                (suspicionPrioriteADroite == true) && (tempsAttentePriorite < 10) ) {
-                myLed.turnOffAllLed();
-                wait(0.05);
-                myLed.turnOnAllLed();
-                
-                prioriteADroite = true;
-                suspicionPrioriteADroite = false;
-            }
-            if ((!cdOld  && cd && !prioriteADroite) && !(cd && d && c && g && cg) && (lastDir >3))  {
-    
-                suspicionPrioriteADroite = true;
-                prioriteADroite          = false;
-                timerPriorite = clock();
-                tempsAttentePriorite = 0;
-            }
-        }
-        */
 
         
         /**
          *  Déplacement
          */  
-        
-        if (/*prioriteADroite && */(myIR.isDroiteDetected() || myIR.isCentreDetected())) {
+        if ((myIR.isDroiteDetected() || myIR.isCentreDetected())) {
              while(myIR.isDroiteDetected() || myIR.isCentreDetected()|| myIR.isGaucheDetected() ) {
                 myMoteur.stop();
                 wait(1);
              }
-        } else if ((!g && c && !d) || (g && c && d)) {
-            myMoteur.avancer();
+        } else if (raccourci && (c && g && cg && !cd)) {
+            myMoteur.stop();
+            wait(5);
+        } else if  ((!g && c && !d) || (g && c && d)) {
+            myMoteur.avancer(2);
             lastDir = 5;
         } else if( cd && !d) {
             myMoteur.tournerGauche(4);
-            virageEnCours=true;
-            timerVirage = clock();
             lastDir = 1;
         } else if( cd && d) {
             myMoteur.tournerGauche(3);
-            timerVirage = clock();
-            virageEnCours=true;
             lastDir = 2;
         } else if( d && !c) {
             myMoteur.tournerGauche(2);
-            timerVirage = clock();
-            virageEnCours=true;
             lastDir = 3;
         } else if( d && c) {
             myMoteur.tournerGauche(1);
             lastDir = 4;
         } else if( cg && !g) {
             myMoteur.tournerDroite(4);
-            timerVirage = clock();
-            virageEnCours=true;
             lastDir = 9;
         } else if( cg && g) {
             myMoteur.tournerDroite(3);
-            timerVirage = clock();
-            virageEnCours=true;
             lastDir = 8;
         } else if( g && !c) {
             myMoteur.tournerDroite(2);
-            timerVirage = clock();
-            virageEnCours=true;
             lastDir = 7;
         } else if( g && c) {
             myMoteur.tournerDroite(1);
@@ -163,9 +112,9 @@ int main() {
                 
                 while((tempsAttenteSortie < 60) && (!d)) {
                     if (tempsAttenteSortie <= 20) {
-                        myMoteur.tournerGauche(6);
+                        myMoteur.tournerGauche(5);
                     } else {
-                        myMoteur.tournerGauche(7);
+                        myMoteur.tournerGauche(6);
                     }
                     tempsAttenteSortie = clock() - timerSortie;
                     refreshCapteur(); 
@@ -178,9 +127,9 @@ int main() {
                 
                 while((tempsAttenteSortie < 60) && (!g)) {
                     if (tempsAttenteSortie <= 20) {
-                        myMoteur.tournerDroite(6);
+                        myMoteur.tournerDroite(5);
                     } else {
-                        myMoteur.tournerDroite(7);
+                        myMoteur.tournerDroite(6);
                     }
                     tempsAttenteSortie = clock() - timerSortie;
                     refreshCapteur();
@@ -190,10 +139,7 @@ int main() {
 
             } else {
                 myMoteur.stop();
-                /*while(!(blueButton == 0)) {
-                    serialOut.printf("%d - %d - %d - %d - %d * lastDir : %c tempsAttenteSortie : %f\n\r", cg, g, c, d, cd, lastDir, tempsAttenteSortie);
-                    wait(1);
-                }*/
+ 
             } 
         }
 

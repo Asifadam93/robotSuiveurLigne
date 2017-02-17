@@ -14,12 +14,12 @@ class Moteur{
     float       deltaE;
     Serial serialOut;
     
-    const static float vitesseReference = 0.8f;
+    const static float vitesseReference = 1.0f;
     const static float vitesseMax = 1.0f;
     
     public:
     Moteur();
-    void avancer();
+    void avancer(int force);
     void stop();
     void tournerGauche(int force);
     void tournerDroite(int force);
